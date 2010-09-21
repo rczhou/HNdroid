@@ -107,7 +107,7 @@ public class Main extends Activity {
     			Toast.makeText(Main.this, "Login failed :(", Toast.LENGTH_LONG).show();
     			break;
     		case LOGIN_SUCCESSFULL:
-    			Toast.makeText(Main.this, "Successfull login :)", Toast.LENGTH_LONG).show();
+    			Toast.makeText(Main.this, "Successful login :)", Toast.LENGTH_LONG).show();
     			dialog = ProgressDialog.show(Main.this, "", "Reloading. Please wait...", true);
     	    	new Thread(new Runnable(){
     	    		public void run() {
