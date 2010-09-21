@@ -310,30 +310,36 @@ public class Comments extends Activity {
     				Integer depthValue = Integer.parseInt(depth) / 2;
     				TagNode nodeParent = commentNode.getParent().getParent();
     				Object[] comment = nodeParent.evaluateXPath("//span[@class='comment']");
+    				Comment commentEntry;
     				if (comment.length > 0) {
-    					Object[] score = nodeParent.evaluateXPath("//span[@class='comhead']/span");
-    					Object[] author = nodeParent.evaluateXPath("//span[@class='comhead']/a[1]");
-    					Object[] replyTo = nodeParent.evaluateXPath("//p/font[@size='1']/u/a");
-    					Object[] upVotes = nodeParent.getParent().evaluateXPath("//td[@valign='top']/center/a[1]");
-    					
-    					TagNode scoreNode = (TagNode) score[0];
-    					TagNode authorNode = (TagNode) author[0];
-    					
-    					String upVoteUrl = "";
-    					String replyToValue = "";
-    					String scoreValue = scoreNode.getChildren().iterator().next().toString().trim();
-    					String authorValue = authorNode.getChildren().iterator().next().toString().trim();
-    					if (upVotes.length > 0) {
-    						TagNode upVote = (TagNode) upVotes[0];
-    						upVoteUrl = upVote.getAttributeByName("href").toString().trim();
-    					}
-    					if (replyTo.length > 0) {
-    						TagNode replyToNode = (TagNode) replyTo[0];
-    						replyToValue = replyToNode.getAttributeByName("href").toString().trim();
-    					}
     					TagNode commentSpan = (TagNode) comment[0];
     					StringBuffer commentText = commentSpan.getText();
-    					Comment commentEntry = new Comment(commentText.toString(), scoreValue, authorValue, depthValue, replyToValue, upVoteUrl);
+    					if (!commentText.toString().equalsIgnoreCase("[deleted]")) {
+    						Object[] score = nodeParent.evaluateXPath("//span[@class='comhead']/span");
+    						Object[] author = nodeParent.evaluateXPath("//span[@class='comhead']/a[1]");
+    						Object[] replyTo = nodeParent.evaluateXPath("//p/font[@size='1']/u/a");
+    						Object[] upVotes = nodeParent.getParent().evaluateXPath("//td[@valign='top']/center/a[1]");
+
+    						TagNode scoreNode = (TagNode) score[0];
+    						TagNode authorNode = (TagNode) author[0];
+
+    						String upVoteUrl = "";
+    						String replyToValue = "";
+    						String scoreValue = scoreNode.getChildren().iterator().next().toString().trim();
+    						String authorValue = authorNode.getChildren().iterator().next().toString().trim();
+    						if (upVotes.length > 0) {
+    							TagNode upVote = (TagNode) upVotes[0];
+    							upVoteUrl = upVote.getAttributeByName("href").toString().trim();
+    						}
+    						if (replyTo.length > 0) {
+    							TagNode replyToNode = (TagNode) replyTo[0];
+    							replyToValue = replyToNode.getAttributeByName("href").toString().trim();
+    						}
+
+    						commentEntry = new Comment(commentText.toString(), scoreValue, authorValue, depthValue, replyToValue, upVoteUrl);
+    					} else {
+    						commentEntry = new Comment("[deleted]");
+    					}
     					commentsList.add(commentEntry);
     				}
     			}
