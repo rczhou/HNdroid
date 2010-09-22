@@ -57,6 +57,8 @@ public class Comments extends Activity {
 	
 	String fnId = "";
 	
+	Boolean loggedIn = false;
+	
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -210,22 +212,30 @@ public class Comments extends Activity {
     			return true;
     		}
     	});
-    	
-    	if (fnId != "") {
-    		MenuItem itemComment = menu.add(0, MENU_COMMENT, Menu.NONE, R.string.menu_comment);
-    		itemComment.setIcon(R.drawable.ic_menu_compose);
-    		itemComment.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-    			@Override
-    			public boolean onMenuItemClick(MenuItem item) {
-    				CommentDialog commentDialog = new CommentDialog(Comments.this, "Comment on submission", new OnCommentListener());
-    				commentDialog.show();
 
-    				return true;
-    			}
-    		});
+    	MenuItem itemComment = menu.add(0, MENU_COMMENT, Menu.NONE, R.string.menu_comment);
+    	itemComment.setIcon(R.drawable.ic_menu_compose);
+    	itemComment.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+    		@Override
+    		public boolean onMenuItemClick(MenuItem item) {
+    			CommentDialog commentDialog = new CommentDialog(Comments.this, "Comment on submission", new OnCommentListener());
+    			commentDialog.show();
+
+    			return true;
+    		}
+    	});
+
+    	return true;
+    }
+    
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+    	if (!loggedIn || fnId == "") {
+    		menu.findItem(MENU_COMMENT).setVisible(false);
+    		menu.findItem(MENU_COMMENT).setEnabled(false);
     	}
     	
-    	return true;
+    	return super.onPrepareOptionsMenu(menu); 
     }
     
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
@@ -235,7 +245,7 @@ public class Comments extends Activity {
     	final Comment newsContexted = (Comment) newsListView.getAdapter().getItem(info.position);
     	
     	menu.setHeaderTitle(newsContexted.getTitle()); 	
-    	if (fnId != "" && newsContexted.getReplyToUrl() != "") {
+    	if (fnId != "" && newsContexted.getReplyToUrl() != "" && loggedIn) {
     		MenuItem originalLink = menu.add(0, CONTEXT_REPLY, 0, R.string.context_reply); 
     		originalLink.setOnMenuItemClickListener(new OnMenuItemClickListener() {		
     			public boolean onMenuItemClick(MenuItem item) {
@@ -250,7 +260,7 @@ public class Comments extends Activity {
     		});
     	}
     	
-    	if (newsContexted.getUpVoteUrl() != "") {
+    	if (newsContexted.getUpVoteUrl() != "" && loggedIn) {
     		MenuItem upVote = menu.add(0, CONTEXT_UPVOTE, 0, R.string.context_upvote);
         	upVote.setOnMenuItemClickListener(new OnMenuItemClickListener() {		
         		public boolean onMenuItemClick(MenuItem item) {
@@ -296,6 +306,10 @@ public class Comments extends Activity {
     		HtmlCleaner cleaner = new HtmlCleaner();
     		TagNode node = cleaner.clean(responseBody);
 
+    		Object[] loginFnid = node.evaluateXPath("//span[@class='pagetop']/a");
+    		TagNode loginNode = (TagNode) loginFnid[5];
+    		if (loginNode.getAttributeByName("href").toString().trim().equalsIgnoreCase("submit"))
+    			loggedIn = true;
     		Object[] forms = node.evaluateXPath("//form[@method='post']/input[@name='fnid']");
     		if (forms.length == 1) {
     			TagNode formNode = (TagNode)forms[0];
