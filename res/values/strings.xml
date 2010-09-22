@@ -3,6 +3,7 @@
     <string name="app_name">HNdroid</string>
     <string name="hnfeed">http://news.ycombinator.com/</string>
     <string name="menu_refresh">Refresh</string>
+    <string name="menu_lists">Lists</string>
     <string name="menu_comments">Comments</string>
     <string name="menu_comment">Comment</string>
     <string name="menu_submissions">Submissions</string>

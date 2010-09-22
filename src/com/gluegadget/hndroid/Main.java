@@ -34,6 +34,7 @@ import android.preference.PreferenceManager;
 import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem.OnMenuItemClickListener;
@@ -51,6 +52,12 @@ public class Main extends Activity {
 	static final private int MENU_LOGOUT = 3;
 	static final private int MENU_PREFERENCES = 4;
 	
+	private static final int LIST_MENU_GROUP = 10;
+	private static final int LIST_NEWS_ID = 11;
+	private static final int LIST_BEST_ID = 12;
+	private static final int LIST_ACTIVE_ID = 13;
+	private static final int LIST_NOOB_ID = 14;
+	
 	static final private int CONTEXT_USER_SUBMISSIONS = 2;
 	static final private int CONTEXT_COMMENTS = 3;
 	static final private int CONTEXT_USER_LINK = 4;
@@ -60,6 +67,8 @@ public class Main extends Activity {
 	static final private int NOTIFY_DATASET_CHANGED = 1;
 	static final private int LOGIN_FAILED = 2;
 	static final private int LOGIN_SUCCESSFULL = 3;
+
+	
 	
 	static int DEFAULT_ACTION_PREFERENCES = 0;
 	
@@ -236,6 +245,14 @@ public class Main extends Activity {
     			return true;
     		}
     	});
+    	
+    	SubMenu subMenu = menu.addSubMenu(R.string.menu_lists);
+    	subMenu.add(LIST_MENU_GROUP, LIST_NEWS_ID, 0, "news");
+    	subMenu.add(LIST_MENU_GROUP, LIST_BEST_ID, 1, "best");
+    	subMenu.add(LIST_MENU_GROUP, LIST_ACTIVE_ID, 2, "active");
+    	subMenu.add(LIST_MENU_GROUP, LIST_NOOB_ID, 3, "noobstories");
+    	subMenu.setIcon(R.drawable.ic_menu_friendslist);
+    	subMenu.setGroupCheckable(LIST_MENU_GROUP, true, true);
 
     	MenuItem itemLogout = menu.add(0, MENU_LOGOUT, Menu.NONE, R.string.menu_logout);
     	itemLogout.setIcon(R.drawable.ic_menu_logout);
@@ -284,7 +301,6 @@ public class Main extends Activity {
 			}
 		});
 
-
     	return true;
     }
     
@@ -304,6 +320,30 @@ public class Main extends Activity {
     	}
     	
     	return super.onPrepareOptionsMenu(menu); 
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+    	switch (item.getItemId()) {
+    	case LIST_ACTIVE_ID:
+    	case LIST_BEST_ID:
+    	case LIST_NOOB_ID:
+    	case LIST_NEWS_ID:
+    		try {
+				dialog = ProgressDialog.show(Main.this, "", "Reloading. Please wait...", true);
+				new Thread(new Runnable(){
+					public void run() {
+						String hnFeed = getString(R.string.hnfeed);
+						refreshNews(hnFeed + item.toString());
+						dialog.dismiss();
+						handler.sendEmptyMessage(NOTIFY_DATASET_CHANGED);
+					}
+				}).start();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+    	}
+    	return true;
     }
     
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
