@@ -7,47 +7,53 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class NewsAdapter extends ArrayAdapter<News> {
+	private LayoutInflater mInflater;
 	int resource;
 	
 	public NewsAdapter(Context _context, int _resource, List<News> _items) {
 		super(_context, _resource, _items);
+		mInflater = (LayoutInflater)_context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		resource = _resource;
+	}
+	
+	static class ViewHolder {
+		TextView title;
+		TextView score;
+		TextView author;
 	}
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		LinearLayout newsView;
+		ViewHolder holder;
+		
 		News item = getItem(position);
-		String title = item.getTitle();
-		String score = item.getScore();
-		String author = item.getAuthor();
-		String domain = item.getDomain();
 		
 		if (convertView == null) {
-			newsView = new LinearLayout(getContext());
-			String inflater = Context.LAYOUT_INFLATER_SERVICE;
-			LayoutInflater vi = (LayoutInflater)getContext().getSystemService(inflater);
-			vi.inflate(resource, newsView, true);
+			convertView = mInflater.inflate(resource, parent, false);
+			holder = new ViewHolder();
+			holder.title = (TextView)convertView.findViewById(R.id.title);
+			holder.score = (TextView)convertView.findViewById(R.id.score);
+			holder.author = (TextView)convertView.findViewById(R.id.author);
+			convertView.setTag(holder);
 		} else {
-			newsView = (LinearLayout) convertView;
+			holder = (ViewHolder)convertView.getTag();
 		}
 		
-		TextView titleView = (TextView)newsView.findViewById(R.id.title);
-		TextView scoreView = (TextView)newsView.findViewById(R.id.score);
-		TextView authorView = (TextView)newsView.findViewById(R.id.author);
-		titleView.setText(title);
-		scoreView.setText(score);
-		if (author == "")
-			authorView.setText(author);
+		holder.title.setText(item.getTitle());
+		holder.score.setText(item.getScore());
+
+		if (item.getAuthor() == "")
+			holder.author.setText(item.getAuthor());
 		else
-			if (domain == "")
-				authorView.setText("by " + author);
+			if (item.getDomain() == "")
+				holder.author.setText("by " + item.getAuthor());
 			else
-				authorView.setText("by " + author + " from " + domain);
-		return newsView;
+				holder.author.setText("by " + item.getAuthor() + " from " + item.getDomain());
+		
+
+		return convertView;
 	}
 }
