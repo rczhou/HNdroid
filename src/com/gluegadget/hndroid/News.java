@@ -5,14 +5,16 @@ public class News {
 	private String title;
 	private String author;
 	private String score;
+	private String comment;
 	private String url;
 	private String domain;
 	private String commentsUrl;
 	private String upVoteUrl;
 
-	public News(String _title, String _score, String _author, String _domain, String _url, String _commentsUrl, String _upVoteUrl) {
+	public News(String _title, String _score, String _comment, String _author, String _domain, String _url, String _commentsUrl, String _upVoteUrl) {
 		title = _title;
 		score = _score;
+		comment = _comment;
 		author = _author;
 		url = _url;
 		if (_commentsUrl.length() > 7)
@@ -32,7 +34,7 @@ public class News {
 	}
 	
 	public News(String _title) {
-		this(_title, "", "", "", "", "", "");
+		this(_title, "", "", "", "", "", "", "");
 	}
 	
 	public String getCommentsUrl() {
@@ -47,6 +49,20 @@ public class News {
 		return score;
 	}
 	
+	public String getComment() {
+		String returnValue = "";
+		if (comment.contains("discuss")) {
+			returnValue = "0";
+		} else {
+			String tmp = comment.replaceAll("comments?", "");
+			if (tmp.length() == 0)
+				returnValue = "?";
+			else
+				returnValue = tmp;
+		}
+		
+		return returnValue;
+	}
 	public String getAuthor() {
 		return author;
 	}

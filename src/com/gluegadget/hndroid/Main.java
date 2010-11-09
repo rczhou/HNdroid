@@ -67,11 +67,8 @@ public class Main extends Activity {
 	static final private int NOTIFY_DATASET_CHANGED = 1;
 	static final private int LOGIN_FAILED = 2;
 	static final private int LOGIN_SUCCESSFULL = 3;
-
-	
 	
 	static int DEFAULT_ACTION_PREFERENCES = 0;
-	
 	
 	String loginUrl;
 	
@@ -91,7 +88,7 @@ public class Main extends Activity {
 
     	newsListView = (ListView)this.findViewById(R.id.hnListView);
     	registerForContextMenu(newsListView);
-    	int layoutID = R.layout.simple_list_item_1;
+    	int layoutID = R.layout.news_list_item;
     	aa = new NewsAdapter(this, layoutID , news);
     	newsListView.setAdapter(aa);
     	newsListView.setOnItemClickListener(clickListener);
@@ -111,6 +108,7 @@ public class Main extends Activity {
     		switch(msg.what){
     		case NOTIFY_DATASET_CHANGED:
     			aa.notifyDataSetChanged();
+    			newsListView.setSelection(0);
     			break;
     		case LOGIN_FAILED:
     			Toast.makeText(Main.this, "Login failed :(", Toast.LENGTH_LONG).show();
@@ -453,6 +451,7 @@ public class Main extends Activity {
     		Object[] newsTitles = node.evaluateXPath("//td[@class='title']/a[1]");
     		Object[] scores = node.evaluateXPath("//td[@class='subtext']/span");
     		Object[] authors = node.evaluateXPath("//td[@class='subtext']/a[1]");
+    		Object[] comments = node.evaluateXPath("//td[@class='subtext']/a[2]");
     		Object[] domains = node.evaluateXPath("//span[@class='comhead']");
     		Object[] loginFnid = node.evaluateXPath("//span[@class='pagetop']/a");
     		TagNode loginNode = (TagNode) loginFnid[5];
@@ -467,6 +466,7 @@ public class Main extends Activity {
     			for (int i = 0; i < newsTitles.length; i++) {
     				String scoreValue = "";
     				String authorValue = "";
+    				String commentValue = "";
     				String domainValue = "";
     				String commentsUrl = "";
     				String upVoteUrl = "";
@@ -478,6 +478,7 @@ public class Main extends Activity {
     				if (i < scores.length) {
     					TagNode score = (TagNode)scores[i];
     					TagNode author = (TagNode)authors[i];
+    					TagNode comment = (TagNode)comments[i];
     					TagNode userNode = newsTitle.getParent().getParent();
     					Object[] upVotes = userNode.evaluateXPath("//td/center/a[1]");
     					if (upVotes.length > 0) {
@@ -491,6 +492,7 @@ public class Main extends Activity {
     					
     					scoreValue = score.getChildren().iterator().next().toString().trim();
     					authorValue = author.getChildren().iterator().next().toString().trim();
+    					commentValue = comment.getChildren().iterator().next().toString().trim();
     					
     					if (href.startsWith("http")) {
     						TagNode domain = (TagNode)domains[j];
@@ -499,7 +501,7 @@ public class Main extends Activity {
     					}
     				}
 
-    				News newsEntry = new News(title, scoreValue, authorValue, domainValue, href, commentsUrl, upVoteUrl);
+    				News newsEntry = new News(title, scoreValue, commentValue, authorValue, domainValue, href, commentsUrl, upVoteUrl);
     				news.add(newsEntry);
     			}
     		}

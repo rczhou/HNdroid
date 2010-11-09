@@ -29,6 +29,7 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -58,13 +59,14 @@ public class Submissions extends Activity {
 
     	newsListView = (ListView)this.findViewById(R.id.hnListView);
     	registerForContextMenu(newsListView);
-    	int layoutID = R.layout.simple_list_item_1;
+    	int layoutID = R.layout.news_list_item;
     	aa = new NewsAdapter(this, layoutID , news);
     	newsListView.setAdapter(aa);
     	newsListView.setOnItemClickListener(clickListener);
 
     	final Bundle extras = getIntent().getExtras();
-    	setTitle(extras.getString("title"));
+    	TextView hnTopDesc = (TextView)this.findViewById(R.id.hnTopDesc);
+    	hnTopDesc.setText(extras.getString("title"));
     	dialog = ProgressDialog.show(Submissions.this, "", "Loading. Please wait...", true);
     	new Thread(new Runnable(){
     		public void run() {
@@ -210,6 +212,7 @@ public class Submissions extends Activity {
     		Object[] newsTitles = node.evaluateXPath("//td[@class='title']/a");
     		Object[] scores = node.evaluateXPath("//td[@class='subtext']/span");
     		Object[] authors = node.evaluateXPath("//td[@class='subtext']/a[1]");
+    		Object[] comments = node.evaluateXPath("//td[@class='subtext']/a[2]");
     		Object[] domains = node.evaluateXPath("//span[@class='comhead']");
     		Object[] loginFnid = node.evaluateXPath("//span[@class='pagetop']/a");
     		TagNode loginNode = (TagNode) loginFnid[5];
@@ -220,6 +223,7 @@ public class Submissions extends Activity {
     			for (int i = 0; i < newsTitles.length; i++) {
     				String scoreValue = "";
     				String authorValue = "";
+    				String commentValue = "";
     				String domainValue = "";
     				String commentsUrl = "";
     				String upVoteUrl = "";
@@ -231,6 +235,7 @@ public class Submissions extends Activity {
     				if (i < scores.length) {
     					TagNode score = (TagNode)scores[i];
     					TagNode author = (TagNode)authors[i];
+    					TagNode comment = (TagNode)comments[i];
     					TagNode userNode = newsTitle.getParent().getParent();
     					Object[] upVotes = userNode.evaluateXPath("//td/center/a[1]");
     					if (upVotes.length > 0) {
@@ -244,6 +249,7 @@ public class Submissions extends Activity {
     					
     					scoreValue = score.getChildren().iterator().next().toString().trim();
     					authorValue = author.getChildren().iterator().next().toString().trim();
+    					commentValue = comment.getChildren().iterator().next().toString().trim();
     					
     					if (href.startsWith("http")) {
     						TagNode domain = (TagNode)domains[j];
@@ -252,7 +258,7 @@ public class Submissions extends Activity {
     					}
     				}
 
-    				News newsEntry = new News(title, scoreValue, authorValue, domainValue, href, commentsUrl, upVoteUrl);
+    				News newsEntry = new News(title, scoreValue, commentValue, authorValue, domainValue, href, commentsUrl, upVoteUrl);
     				news.add(newsEntry);
     			}
     		}

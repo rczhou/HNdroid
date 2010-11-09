@@ -22,6 +22,7 @@ public class NewsAdapter extends ArrayAdapter<News> {
 	static class ViewHolder {
 		TextView title;
 		TextView score;
+		TextView comment;
 		TextView author;
 	}
 	
@@ -36,6 +37,7 @@ public class NewsAdapter extends ArrayAdapter<News> {
 			holder = new ViewHolder();
 			holder.title = (TextView)convertView.findViewById(R.id.title);
 			holder.score = (TextView)convertView.findViewById(R.id.score);
+			holder.comment = (TextView)convertView.findViewById(R.id.comments);
 			holder.author = (TextView)convertView.findViewById(R.id.author);
 			convertView.setTag(holder);
 		} else {
@@ -44,6 +46,7 @@ public class NewsAdapter extends ArrayAdapter<News> {
 		
 		holder.title.setText(item.getTitle());
 		holder.score.setText(item.getScore());
+		holder.comment.setText(item.getComment());
 
 		if (item.getAuthor() == "")
 			holder.author.setText(item.getAuthor());

@@ -32,6 +32,7 @@ import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.MenuItem.OnMenuItemClickListener;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class Comments extends Activity {
@@ -67,13 +68,14 @@ public class Comments extends Activity {
         
         newsListView = (ListView)this.findViewById(R.id.hnListView);
         registerForContextMenu(newsListView);
-        int layoutID = R.layout.simple_list_item_1;
+        int layoutID = R.layout.comments_list_item;
         aa = new CommentsAdapter(this, layoutID , commentsList);
         newsListView.setAdapter(aa);
         
     	final Bundle extras = getIntent().getExtras();
     	extrasCommentsUrl = extras.getString("url");
-    	setTitle(extras.getString("title"));
+    	TextView hnTopDesc = (TextView)this.findViewById(R.id.hnTopDesc);
+    	hnTopDesc.setText(extras.getString("title"));
     	dialog = ProgressDialog.show(Comments.this, "", "Loading. Please wait...", true);
     	new Thread(new Runnable(){
     		public void run() {

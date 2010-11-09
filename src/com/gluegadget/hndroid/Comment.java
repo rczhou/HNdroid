@@ -55,6 +55,6 @@ public class Comment {
 
 	@Override
 	public String toString() {
-		return "";
+		return author + ": " + title;
 	}
 }
