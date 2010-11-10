@@ -70,7 +70,7 @@ public class Main extends Activity {
 	
 	static int DEFAULT_ACTION_PREFERENCES = 0;
 	
-	String loginUrl;
+	String loginUrl = "";
 	
 	ProgressDialog dialog;
 	
