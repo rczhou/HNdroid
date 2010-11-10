@@ -83,6 +83,7 @@ public class Submissions extends Activity {
     		switch(msg.what){
     		case NOTIFY_DATASET_CHANGED:
     			aa.notifyDataSetChanged();
+    			newsListView.setSelection(0);
     			break;
     		}
     	}
