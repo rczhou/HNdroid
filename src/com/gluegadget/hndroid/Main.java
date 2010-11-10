@@ -288,7 +288,7 @@ public class Main extends Activity {
     	});
     	
     	MenuItem itemPreferences = menu.add(0, MENU_PREFERENCES, Menu.NONE, R.string.menu_preferences);
-    	itemPreferences.setIcon(android.R.drawable.ic_menu_preferences);
+    	itemPreferences.setIcon(R.drawable.ic_menu_preferences);
     	itemPreferences.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 			@Override
 			public boolean onMenuItemClick(MenuItem item) {
