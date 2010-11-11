@@ -14,6 +14,7 @@
 		android:paddingTop="9dip"
 		android:gravity="center_horizontal"
 		android:textStyle="bold"
+		android:clickable="true"
 	/>
 	
 	<TextView xmlns:android="http://schemas.android.com/apk/res/android"
