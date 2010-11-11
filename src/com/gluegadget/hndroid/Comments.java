@@ -369,6 +369,8 @@ public class Comments extends Activity {
     		e.printStackTrace();
     	} catch (XPatherException e) {
     		e.printStackTrace();
+    	} catch (IllegalStateException e) {
+    		finish();
     	} finally {
 
     	}
