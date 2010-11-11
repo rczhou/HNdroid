@@ -211,9 +211,7 @@ public class Submissions extends Activity {
     		TagNode node = cleaner.clean(responseBody);
 
     		Object[] newsTitles = node.evaluateXPath("//td[@class='title']/a");
-    		Object[] scores = node.evaluateXPath("//td[@class='subtext']/span");
-    		Object[] authors = node.evaluateXPath("//td[@class='subtext']/a[1]");
-    		Object[] comments = node.evaluateXPath("//td[@class='subtext']/a[2]");
+    		Object[] subtexts = node.evaluateXPath("//td[@class='subtext']");
     		Object[] domains = node.evaluateXPath("//span[@class='comhead']");
     		Object[] loginFnid = node.evaluateXPath("//span[@class='pagetop']/a");
     		TagNode loginNode = (TagNode) loginFnid[5];
@@ -221,7 +219,8 @@ public class Submissions extends Activity {
 
     		if (newsTitles.length > 0) {
     			int j = 0;
-    			for (int i = 0; i < newsTitles.length; i++) {
+    			int iterateFor = newsTitles.length;
+    			for (int i = 0; i < iterateFor; i++) {
     				String scoreValue = "";
     				String authorValue = "";
     				String commentValue = "";
@@ -233,10 +232,19 @@ public class Submissions extends Activity {
     				String title = newsTitle.getChildren().iterator().next().toString().trim();
     				String href = newsTitle.getAttributeByName("href").toString().trim();
 
-    				if (i < scores.length) {
-    					TagNode score = (TagNode)scores[i];
-    					TagNode author = (TagNode)authors[i];
-    					TagNode comment = (TagNode)comments[i];
+    				if (i < subtexts.length) {
+    					TagNode subtext = (TagNode) subtexts[i];
+    					Object[] scoreSpanNode = subtext.evaluateXPath("/span");
+    					TagNode score = (TagNode) scoreSpanNode[0];
+    					
+    					Object[] scoreAnchorNodes = subtext.evaluateXPath("/a");
+    					TagNode author = (TagNode) scoreAnchorNodes[0];
+    					authorValue = author.getChildren().iterator().next().toString().trim();
+    					if (scoreAnchorNodes.length == 2) {
+    						TagNode comment = (TagNode) scoreAnchorNodes[1];
+    						commentValue = comment.getChildren().iterator().next().toString().trim();
+    					}
+
     					TagNode userNode = newsTitle.getParent().getParent();
     					Object[] upVotes = userNode.evaluateXPath("//td/center/a[1]");
     					if (upVotes.length > 0) {
@@ -250,7 +258,6 @@ public class Submissions extends Activity {
     					
     					scoreValue = score.getChildren().iterator().next().toString().trim();
     					authorValue = author.getChildren().iterator().next().toString().trim();
-    					commentValue = comment.getChildren().iterator().next().toString().trim();
     					
     					if (href.startsWith("http")) {
     						TagNode domain = (TagNode)domains[j];
