@@ -15,6 +15,7 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
+import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 import org.htmlcleaner.XPatherException;
@@ -329,8 +330,8 @@ public class Comments extends Activity {
     				Comment commentEntry;
     				if (comment.length > 0) {
     					TagNode commentSpan = (TagNode) comment[0];
-    					StringBuffer commentText = commentSpan.getText();
-    					if (!commentText.toString().equalsIgnoreCase("[deleted]")) {
+    					String commentText = cleanUpComment(commentSpan);
+    					if (!commentText.equalsIgnoreCase("[deleted]")) {
     						Object[] score = nodeParent.evaluateXPath("//span[@class='comhead']/span");
     						Object[] author = nodeParent.evaluateXPath("//span[@class='comhead']/a[1]");
     						Object[] replyTo = nodeParent.evaluateXPath("//p/font[@size='1']/u/a");
@@ -352,7 +353,7 @@ public class Comments extends Activity {
     							replyToValue = replyToNode.getAttributeByName("href").toString().trim();
     						}
 
-    						commentEntry = new Comment(commentText.toString(), scoreValue, authorValue, depthValue, replyToValue, upVoteUrl);
+    						commentEntry = new Comment(commentText, scoreValue, authorValue, depthValue, replyToValue, upVoteUrl);
     					} else {
     						commentEntry = new Comment("[deleted]");
     					}
@@ -374,5 +375,42 @@ public class Comments extends Activity {
     	} finally {
 
     	}
+    }
+    private String cleanUpComment(TagNode commentNode) throws IOException { 
+    	// take default cleaner properties
+    	CleanerProperties props = new CleanerProperties();
+    	props.setTranslateSpecialEntities(false);
+    	
+    	HtmlCleaner cleaner = new HtmlCleaner(props);
+    	
+    	/* [hack] */
+    	
+    	String commentAsString = cleaner.getInnerHtml(commentNode);
+    	commentAsString = commentAsString.replaceAll("<p>", "\n\n");
+    	commentAsString = commentAsString.replaceAll("&amp;", "&");
+    	commentAsString = commentAsString.replaceAll("&quot;", "\"");
+    	commentAsString = commentAsString.replaceAll("&apos;", "\'");
+    	   	
+    	commentAsString = commentAsString.replaceAll("&#62;", ">");    	
+    	commentAsString = commentAsString.replaceAll("<[^\\>]+>", "");
+    	
+    	return commentAsString;
+    	
+    	/*
+    	 * [/hack]
+    	 *
+    	 * Ideally what I'd want to do here is:
+    	 * 
+    	 * 	rawCommentString = rawCommentString.replace("<p>", "\n\n");
+    	 * 	cleaner.setInnerHtml(commentNode, rawCommentString);
+    	 * 	return commentNode.getText().toString();
+    	 * 
+    	 * but somehow in that process the htmlcleaner translates all the special characters into
+    	 * special html entities (&amp;, &quot;, etc) but doesn't translate them back when commentNode.getText()
+    	 * is called. 
+    	 * 
+    	 * I almost think this is a bug with HTMLCleaner since part of what I was trying to fix here were the random
+    	 * '&#62's that would float around the comments
+    	 */
     }
 }
